@@ -229,3 +229,16 @@ func TestEquals(t *testing.T) {
 		assert.Equal(t, tt.want, tt.b.Equals(tt.a), "b.Equals(a) a: %#v b: %#v", tt.a, tt.b)
 	}
 }
+
+func TestFieldNilValue(t *testing.T) {
+	tests := []FieldType{
+		StringerType,
+		ArrayMarshalerType,
+		ObjectMarshalerType,
+	}
+	for _, tt := range tests {
+		f := Field{Key: "k", Interface: nil, Type: tt}
+		enc := NewMapObjectEncoder()
+		assert.NotPanics(t, func() { f.AddTo(enc) }, "Unexpected panic when adding fields with nil value.")
+	}
+}

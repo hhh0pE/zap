@@ -109,9 +109,17 @@ func (f Field) AddTo(enc ObjectEncoder) {
 
 	switch f.Type {
 	case ArrayMarshalerType:
-		err = enc.AddArray(f.Key, f.Interface.(ArrayMarshaler))
+		if f.Interface != nil {
+			err = enc.AddArray(f.Key, f.Interface.(ArrayMarshaler))
+		} else {
+			enc.AddString(f.Key, "nil")
+		}
 	case ObjectMarshalerType:
-		err = enc.AddObject(f.Key, f.Interface.(ObjectMarshaler))
+		if f.Interface != nil {
+			err = enc.AddObject(f.Key, f.Interface.(ObjectMarshaler))
+		} else {
+			enc.AddString(f.Key, "nil")
+		}
 	case BinaryType:
 		enc.AddBinary(f.Key, f.Interface.([]byte))
 	case BoolType:
@@ -160,7 +168,11 @@ func (f Field) AddTo(enc ObjectEncoder) {
 	case NamespaceType:
 		enc.OpenNamespace(f.Key)
 	case StringerType:
-		enc.AddString(f.Key, f.Interface.(fmt.Stringer).String())
+		if f.Interface != nil {
+			enc.AddString(f.Key, f.Interface.(fmt.Stringer).String())
+		} else {
+			enc.AddString(f.Key, "nil")
+		}
 	case ErrorType:
 		encodeError(f.Key, f.Interface.(error), enc)
 	case SkipType:
